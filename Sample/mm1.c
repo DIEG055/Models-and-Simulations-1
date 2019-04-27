@@ -1,4 +1,4 @@
-/* External definitions for single-server queueing system, fixed run length. */
+/* External definitions for single-server queueing system. */
 
 #include <stdio.h>
 #include <math.h>
@@ -8,10 +8,11 @@
 #define BUSY      1  /* Mnemonics for server's being busy */
 #define IDLE      0  /* and idle. */
 
-int   next_event_type, num_custs_delayed, num_events, num_in_q, server_status;
+int   next_event_type, num_custs_delayed, num_delays_required, num_events,
+      num_in_q, server_status;
 float area_num_in_q, area_server_status, mean_interarrival, mean_service,
-      sim_time, time_arrival[Q_LIMIT + 1], time_end, time_last_event,
-      time_next_event[4], total_of_delays;
+      sim_time, time_arrival[Q_LIMIT + 1], time_last_event, time_next_event[3],
+      total_of_delays;
 FILE  *infile, *outfile;
 
 void  initialize(void);
@@ -27,34 +28,33 @@ main()  /* Main function. */
 {
     /* Open input and output files. */
 
-    infile  = fopen("mm1alt.in",  "r");
-    outfile = fopen("mm1alt.out", "w");
+    infile  = fopen("mm1.in",  "r");
+    outfile = fopen("mm1.out", "w");
 
     /* Specify the number of events for the timing function. */
 
-    num_events = 3;
+    num_events = 2;
 
     /* Read input parameters. */
 
-    fscanf(infile, "%f %f %f", &mean_interarrival, &mean_service, &time_end);
+    fscanf(infile, "%f %f %d", &mean_interarrival, &mean_service,
+           &num_delays_required);
 
     /* Write report heading and input parameters. */
 
-    fprintf(outfile, "Single-server queueing system with fixed run");
-    fprintf(outfile, " length\n\n");
+    fprintf(outfile, "Single-server queueing system\n\n");
     fprintf(outfile, "Mean interarrival time%11.3f minutes\n\n",
             mean_interarrival);
     fprintf(outfile, "Mean service time%16.3f minutes\n\n", mean_service);
-    fprintf(outfile, "Length of the simulation%9.3f minutes\n\n", time_end);
+    fprintf(outfile, "Number of customers%14d\n\n", num_delays_required);
 
     /* Initialize the simulation. */
 
     initialize();
 
-    /* Run the simulation until it terminates after an end-simulation event
-       (type 3) occurs. */
+    /* Run the simulation while more delays are still needed. */
 
-    do
+    while (num_custs_delayed < num_delays_required)
     {
         /* Determine the next event. */
 
@@ -74,15 +74,12 @@ main()  /* Main function. */
             case 2:
                 depart();
                 break;
-            case 3:
-                report();
-                break;
         }
+    }
 
-    /* If the event just executed was not the end-simulation event (type 3),
-       continue simulating.  Otherwise, end the simulation. */
+    /* Invoke the report generator and end the simulation. */
 
-    } while (next_event_type != 3);
+    report();
 
     fclose(infile);
     fclose(outfile);
@@ -111,12 +108,10 @@ void initialize(void)  /* Initialization function. */
     area_server_status = 0.0;
 
     /* Initialize event list.  Since no customers are present, the departure
-       (service completion) event is eliminated from consideration.  The end-
-       simulation event (type 3) is scheduled for time time_end. */
+       (service completion) event is eliminated from consideration. */
 
     time_next_event[1] = sim_time + expon(mean_interarrival);
     time_next_event[2] = 1.0e+30;
-    time_next_event[3] = time_end;
 }
 
 
@@ -130,7 +125,8 @@ void timing(void)  /* Timing function. */
     /* Determine the event type of the next event to occur. */
 
     for (i = 1; i <= num_events; ++i)
-            if (time_next_event[i] < min_time_next_event) {
+        if (time_next_event[i] < min_time_next_event)
+        {
             min_time_next_event = time_next_event[i];
             next_event_type     = i;
         }
@@ -138,9 +134,8 @@ void timing(void)  /* Timing function. */
     /* Check to see whether the event list is empty. */
 
     if (next_event_type == 0)
-    { 
-    
-        /* The event list is empty, so stop the simulation */
+    {
+        /* The event list is empty, so stop the simulation. */
 
         fprintf(outfile, "\nEvent list empty at time %f", sim_time);
         exit(1);
@@ -162,16 +157,16 @@ void arrive(void)  /* Arrival event function. */
 
     /* Check to see whether server is busy. */
 
-    if (server_status == BUSY) {
-
+    if (server_status == BUSY)
+    {
         /* Server is busy, so increment number of customers in queue. */
 
         ++num_in_q;
 
         /* Check to see whether an overflow condition exists. */
 
-        if (num_in_q > Q_LIMIT) {
-
+        if (num_in_q > Q_LIMIT)
+        {
             /* The queue has overflowed, so stop the simulation. */
 
             fprintf(outfile, "\nOverflow of the array time_arrival at");
@@ -185,8 +180,8 @@ void arrive(void)  /* Arrival event function. */
         time_arrival[num_in_q] = sim_time;
     }
 
-    else {
-
+    else
+    {
         /* Server is idle, so arriving customer has a delay of zero.  (The
            following two statements are for program clarity and do not affect
            the results of the simulation.) */
@@ -213,8 +208,8 @@ void depart(void)  /* Departure event function. */
 
     /* Check to see whether the queue is empty. */
 
-    if (num_in_q == 0) {
-
+    if (num_in_q == 0)
+    {
         /* The queue is empty so make the server idle and eliminate the
            departure (service completion) event from consideration. */
 
@@ -222,8 +217,8 @@ void depart(void)  /* Departure event function. */
         time_next_event[2] = 1.0e+30;
     }
 
-    else {
-
+    else
+    {
         /* The queue is nonempty, so decrement the number of customers in
            queue. */
 
@@ -258,8 +253,7 @@ void report(void)  /* Report generator function. */
             area_num_in_q / sim_time);
     fprintf(outfile, "Server utilization%15.3f\n\n",
             area_server_status / sim_time);
-    fprintf(outfile, "Number of delays completed%7d",
-            num_custs_delayed);
+    fprintf(outfile, "Time simulation ended%12.3f minutes", sim_time);
 }
 
 
@@ -286,7 +280,6 @@ void update_time_avg_stats(void)  /* Update area accumulators for time-average
 float expon(float mean)  /* Exponential variate generation function. */
 {
     /* Return an exponential random variate with mean "mean". */
-
-    return -mean * log(lcgrand(1));
+    return -mean * log(lcgrand(2));
 }
 

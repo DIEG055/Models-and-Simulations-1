@@ -1,0 +1,27 @@
+# depslib dependency file v1.0
+1514140574 source:d:\drive\5 semestre\modelos y simulacion\tareas\codigo tarea\modsim_2204\main.c
+	<stdio.h>
+	<stdlib.h>
+
+903991724 source:d:\drive\5 semestre\modelos y simulacion\tareas\codigo tarea\modsim_2204\inv.c
+	<stdio.h>
+	<math.h>
+	"lcgrand.h"
+
+903918616 d:\drive\5 semestre\modelos y simulacion\tareas\codigo tarea\modsim_2204\lcgrand.h
+	"lcgrand.h"
+
+903918794 source:d:\drive\5 semestre\modelos y simulacion\tareas\codigo tarea\modsim_2204\lcgrand.c
+
+1556382901 source:d:\drive\5 semestre\modelos y simulacion\tareas\codigo tarea\modsim_2204\mm1.c
+	<stdio.h>
+	<math.h>
+	"lcgrand.h"
+
+1135988227 source:d:\drive\5 semestre\modelos y simulacion\tareas\codigo tarea\modsim_2204\mm1alt.c
+	<stdio.h>
+	<math.h>
+	"lcgrand.h"
+
+903918794 source:d:\drive\5 semestre\modelos y simulacion\tareas\codigo tarea\modsim_2204\sample\lcgrand.c
+

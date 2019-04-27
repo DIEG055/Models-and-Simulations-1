@@ -31,9 +31,16 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.c">
+		<Unit filename="inv.in" />
+		<Unit filename="lcgrand.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="lcgrand.h" />
+		<Unit filename="mm1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mm1.in" />
+		<Unit filename="mm1alt.in" />
 		<Extensions>
 			<code_completion />
 			<envvars />
