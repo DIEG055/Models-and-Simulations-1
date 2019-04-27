@@ -31,15 +31,6 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="../ModSim_2204/Sample/lcgrand.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../ModSim_2204/Sample/lcgrand.h" />
-		<Unit filename="../ModSim_2204/Sample/mm1.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../ModSim_2204/Sample/mm1.in" />
-		<Unit filename="../ModSim_2204/Sample/mm1.out" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
