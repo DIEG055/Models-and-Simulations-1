@@ -7,7 +7,7 @@
 #define IDLE      0
 
 /*General*/
-int   next_event_type, num_events,num_units_attended,stop_simulation, end_time;
+int   next_event_type, num_events,num_units_attended;
 float mean_interarrival,sim_time, time_last_event,
       time_next_event[4];
 
@@ -41,37 +41,48 @@ main()  /* Main function. */
 {
     /* Open input and output files. */
 
-
+    infile  = fopen("mm1.in",  "r");
+    outfile = fopen("mm1.out", "w");
 
     /* Specify the number of events for the timing function. */
-    infile  = fopen("mm1.in",  "r");
+
     num_events = 3;
 
     /* Read input parameters. */
 
-    fscanf(infile, "%f %f %f", &mean_interarrival, &mean_service_1,
-           &mean_service_2);
+    /*fscanf(infile, "%f %f %d", &mean_interarrival, &mean_service_1,
+           &mean_service_2);*/
 
-
+    mean_service_2=mean_service_1;
+    mean_interarrival=0.1;
+    mean_service_1=0.08;
+    mean_service_2=0.09;
     /* Write report heading and input parameters. */
 
-
+    fprintf(outfile, "Single-server queueing system\n\n");
+    fprintf(outfile, "Mean interarrival time%11.3f minutes\n\n",
+            mean_interarrival);
+    fprintf(outfile, "Mean service 1 time%16.3f minutes\n\n", mean_service_1);
+    fprintf(outfile, "Mean service 2 time%16.3f minutes\n\n", mean_service_2);
 
     /* Initialize the simulation. */
+     printf("mean_interarrival    %d\n", 1);
+      printf("mean_service_1    %d\n", mean_service_1);
+       printf("mean_service_2    %d\n", mean_service_2);
+   for(int i=0;i<5;i++){
 
+    }
     initialize();
 
     /* Run the simulation while more delays are still needed. */
 
     /*while (num_in_q1 < Q1_LIMIT)*/
-    while(sim_time < end_time )
+    while(sim_time < 1 )
     {
         /* Determine the next event. */
 
         timing();
-        if(stop_simulation == 1){
-            break;
-        }
+
         /* Update time-average statistical accumulators. */
 
         update_time_avg_stats();
@@ -94,8 +105,10 @@ main()  /* Main function. */
 
     /* Invoke the report generator and end the simulation. */
 
-    fclose(infile);
     report();
+
+    fclose(infile);
+    fclose(outfile);
 
     return 0;
 }
@@ -104,8 +117,7 @@ main()  /* Main function. */
 void initialize(void)  /* Initialization function. */
 {
     /* Initialize the simulation clock. */
-    end_time = 360;
-    stop_simulation = 0;
+
     sim_time = 0.0;
 
     /* Initialize the state variables. */
@@ -131,7 +143,7 @@ void initialize(void)  /* Initialization function. */
     /* Initialize event list.  Since no customers are present, the departure
        (service completion) event is eliminated from consideration. */
 
-    time_next_event[1] = sim_time + expon(mean_interarrival);
+    time_next_event[1] = sim_time + poisson(mean_interarrival);
     time_next_event[2] = 1.0e+30;
     time_next_event[3] = 1.0e+30;
 
@@ -166,13 +178,7 @@ void timing(void)  /* Timing function. */
 
     /* The event list is not empty, so advance the simulation clock. */
 
-
-    if(min_time_next_event > end_time){
-        stop_simulation= 1;
-    }else{
-        sim_time = min_time_next_event;
-    }
-
+    sim_time = min_time_next_event;
 }
 
 void arrive2(void){
@@ -192,7 +198,7 @@ void arrive2(void){
         ++num_custs_delayed_2;
         server_status_2 = BUSY;
         /* Schedule a departure (service completion). */
-        time_next_event[3] = sim_time + expon(mean_service_2);
+        time_next_event[3] = sim_time + poisson(mean_service_2);
     }
 };
 
@@ -204,7 +210,7 @@ void arrive(void)  /* Arrival event function. */
 
     /* Schedule next arrival. */
 
-    time_next_event[1] = sim_time + expon(mean_interarrival);
+    time_next_event[1] = sim_time + poisson(mean_interarrival);
 
     /* Check to see whether server is busy. */
 
@@ -212,7 +218,7 @@ void arrive(void)  /* Arrival event function. */
     {
 
         /* Check to see whether an Q1 is full. */
-        if (num_in_q_1 > Q1_LIMIT-1)
+        if (num_in_q_1 > Q1_LIMIT)
         {
 
             arrive2();
@@ -241,7 +247,7 @@ void arrive(void)  /* Arrival event function. */
 
         /* Schedule a departure (service completion). */
 
-        time_next_event[2] = sim_time + expon(mean_service_1);
+        time_next_event[2] = sim_time + poisson(mean_service_1);
     }
 }
 
@@ -277,7 +283,7 @@ void depart(void)  /* Departure event function. */
         /* Increment the number of customers delayed, and schedule departure. */
 
         ++num_custs_delayed_1;
-        time_next_event[2] = sim_time + expon(mean_service_1);
+        time_next_event[2] = sim_time + poisson(mean_service_1);
 
         /* Move each customer in queue (if any) up one place. */
 
@@ -319,7 +325,7 @@ void depart2(void)  /* Departure event function. */
         /* Increment the number of customers delayed, and schedule departure. */
 
         ++num_custs_delayed_2;
-        time_next_event[3] = sim_time + expon(mean_service_2);
+        time_next_event[3] = sim_time + poisson(mean_service_2);
 
         /* Move each customer in queue (if any) up one place. */
 
@@ -333,22 +339,14 @@ void report(void)  /* Report generator function. */
 {
     /* Compute and write estimates of desired measures of performance. */
 
-    printf( "\n\nAverage delay in queue%11.3f minutes\n\n",
-            total_of_delays_1 / num_custs_delayed_1);
-    printf( "Average number in queue 1 %10.3f\n\n",
-            area_num_in_q_1 / sim_time);
-    printf( "Server 1 utilization%15.3f\n\n",
-            area_server_status_1 / sim_time);
-
-        printf( "\n\nAverage delay in queue%11.3f minutes\n\n",
-            total_of_delays_2 / num_custs_delayed_2);
-    printf( "Average number in queue 2 %10.3f\n\n",
-            area_num_in_q_2 / sim_time);
-    printf( "Server 2 utilization%15.3f\n\n",
-            area_server_status_2 / sim_time);
-
-    printf( "Time simulation ended%12.3f minutes\n\n", sim_time);
-
+    /*fprintf(outfile, "\n\nAverage delay in queue%11.3f minutes\n\n",
+            total_of_delays / num_custs_delayed);
+    fprintf(outfile, "Average number in queue%10.3f\n\n",
+            area_num_in_q / sim_time);
+    fprintf(outfile, "Server utilization%15.3f\n\n",
+            area_server_status / sim_time);
+    fprintf(outfile, "Time simulation ended%12.3f minutes", sim_time);*/
+    fprintf(outfile, "Ok");
 }
 
 
@@ -388,7 +386,7 @@ float poisson(float lambda) {
 float expon(float mean)  /* Exponential variate generation function. */
 {
     /* Return an exponential random variate with mean "mean". */
-    return -mean * log(lcgrand(1));
+    return -mean * log(lcgrand(2));
 }
 
 
