@@ -72,6 +72,7 @@ void attend_queue_1 (int event_type);
 void attend_queue_2 (int event_type);
 
 
+
 main()  /* Main function. */
 {
     /* Specify the number of events for the timing function. */
@@ -138,16 +139,17 @@ main()  /* Main function. */
     /* Invoke the report generator and end the simulation. */
 
     fclose(infile);
-    //report();
+    report();
 
     return 0;
 }
 
 
+
 void initialize(void)  /* Initialization function. */
 {
     /* Initialize the simulation clock. */
-    end_time = 10;
+    end_time = 500;
     stop_simulation = 0;
     sim_time = 0.0;
 
@@ -227,7 +229,7 @@ void timing(void)  /* Timing function. */
         sim_time = min_time_next_event;
     }
 
-
+/*
 
 
     switch (next_event_type)
@@ -250,7 +252,7 @@ void timing(void)  /* Timing function. */
             case 6:
                 printf("B A2 %3.5f\n", time_next_event[next_event_type] );
                 break;
-        }
+        }*/
 
 
 
@@ -268,7 +270,7 @@ void arrive(void)  /* Arrival event function. */
     /* CHANGE log for something truly random.  */
     /* DETERMINE THE TYPE OF CLIENT */
     if (randomReal() <= probability_type1_client){
-        printf("     type 1" );
+        //printf("     type 1" );
         /*---------------------------------------------- type 1 client arrived -----------------------------------------*/
         if(is_there_any_server_idle()){
             delay_1            = 0.0;
@@ -279,7 +281,7 @@ void arrive(void)  /* Arrival event function. */
 
             /*** EXPLICAR CAMBIO DE LOGICA ***/
             if (server_status_A1 == IDLE){
-                    printf("     METIDO EN A1\n" );
+//printf("     METIDO EN A1\n" );
                 /* SERVER A1 BUSY*/
                 server_status_A1 = BUSY;
 
@@ -287,7 +289,7 @@ void arrive(void)  /* Arrival event function. */
                 time_next_event[2] = sim_time + expon(mean_service_1);
 
             } else if (server_status_A2 == IDLE) {
-                printf("     METIDO EN A2\n" );
+                //printf("     METIDO EN A2\n" );
                 /* SERVER A2 BUSY*/
                 server_status_A2 = BUSY;
 
@@ -295,7 +297,7 @@ void arrive(void)  /* Arrival event function. */
                 time_next_event[3] = sim_time + expon(mean_service_1);
 
             } else {
-                printf("     METIDO EN AB\n" );
+               // printf("     METIDO EN AB\n" );
                 /* SERVER B BUSY*/
                 server_status_B = BUSY;
 
@@ -303,13 +305,13 @@ void arrive(void)  /* Arrival event function. */
                 time_next_event[4] = sim_time + expon(mean_service_1);
             }
         } else {
-            printf("     TOCO ESPERAR\n" );
+            //printf("     TOCO ESPERAR\n" );
             /* Servers are busy, so increment number of customers in queue type 1. */
             ++num_in_q_1;
             time_arrival_1[num_in_q_1] = sim_time;
         }
     } else {
-        printf("     type 2" );
+        //printf("     type 2" );
         /*---------------------------------------------- type 2 client arrived -----------------------------------------*/
         if (server_status_B == IDLE && is_there_any_serverA_idle()){
             delay_2            = 0.0;
@@ -319,7 +321,7 @@ void arrive(void)  /* Arrival event function. */
             ++num_custs_delayed_2;
 
             if (server_status_A1 == IDLE){
-                    printf("     METIDO EN A1 Y B\n" );
+                    //printf("     METIDO EN A1 Y B\n" );
                 /* SERVER B and A1 BUSY*/
                 server_status_B = BUSY;
                 server_status_A1 = BUSY;
@@ -327,7 +329,7 @@ void arrive(void)  /* Arrival event function. */
                 /* Schedule a departure from server B A1. */
                 time_next_event[5] = sim_time + expon(get_mean_service_2());
             } else {
-                printf("     METIDO EN A2 Y B\n" );
+                //printf("     METIDO EN A2 Y B\n" );
                  /* SERVER B and A2 BUSY*/
                 server_status_B = BUSY;
                 server_status_A2 = BUSY;
@@ -504,19 +506,19 @@ void depart_B_A2 (void){
 
 void report(void)  /* Report generator function. */
 {
+    printf("total_of_delays_1: %5.5f\n", total_of_delays_1);
+    printf("area_num_in_q_1: %5.5f\n", area_num_in_q_1);
     /* Compute and write estimates of desired measures of performance. */
-    printf("\n\n total of delays1 : %11.3f / num_cuts_delayed1: %11.3f\n", total_of_delays_1 , num_custs_delayed_1);
-    printf( "\n\nAverage delay in queue%11.3f minutes\n\n",total_of_delays_1 / num_custs_delayed_1);
+    printf( "\n\n Demora Promedio en Q1 : %11.3f minutes\n\n",total_of_delays_1 / num_custs_delayed_1);
+    printf( "Numero Promedio en Q1 %10.3f\n\n",area_num_in_q_1 / sim_time);
 
-    printf("\n\n area num in q1 : %11.3f / sim time : %11.3f\n", area_num_in_q_1 ,  sim_time);
-    printf( "Average number in queue 1 %10.3f\n\n",area_num_in_q_1 / sim_time);
+    printf( "\n\nDemora Promedio en Q2%11.3f minutes\n\n", total_of_delays_2 / num_custs_delayed_2);
+    printf( "Numero Promedio en Q2 %10.3f\n\n", area_num_in_q_2 / sim_time);
+
     /*printf( "Server 1 utilization%15.3f\n\n",
             area_server_status_1 / sim_time);*/
-    printf("\n\n total of delays 2: %11.3f / num_cuts_delayed2 : %11.3f\n", total_of_delays_2 , num_custs_delayed_2);
-    printf( "\n\nAverage delay in queue%11.3f minutes\n\n", total_of_delays_2 / num_custs_delayed_2);
 
-    printf("\n\n area num in q 2: %11.3f / sim time : %11.3f\n", area_num_in_q_2 ,  sim_time);
-    printf( "Average number in queue 2 %10.3f\n\n", area_num_in_q_2 / sim_time);
+
     /*printf( "Server 2 utilization%15.3f\n\n",
             area_server_status_2 / sim_time);*/
 
@@ -544,16 +546,32 @@ void update_time_avg_stats(void)  /* Update area accumulators for time-average
     area_server_status_1 += server_status_1 * time_since_last_event;
     area_server_status_2 += server_status_2 * time_since_last_event;
     */
+
+    float area_server_status_A1_type1;
+    float area_server_status_A1_type2;
+
+    /* Server A2*/
+    int server_status_A2;
+    float area_server_status_A2_type1;
+    float area_server_status_A2_type2;
+
+    /*Server B*/
+    int server_status_B;
+    float area_server_status_B_type1;
+    float area_server_status_B_type2;
+
 }
 
 float expon(float mean)  /* Exponential variate generation function. */
 {
+    // printf("%4.6f\n", -mean * log(lcgrand(rand()))) ;
     /* Return an exponential random variate with mean "mean". */
-    return -mean * log(lcgrand(1));
+    return -mean * log(lcgrand(rand() % 4));
 }
 
 float randomReal(void){
-    return lcgrand(1);
+    //return lcgrand(1);
+    return lcgrand(rand() % 4 );
 }
 
 void attend_queue_1 (int event_type){ // 2, 3 , 4
@@ -580,7 +598,7 @@ void attend_queue_1 (int event_type){ // 2, 3 , 4
     for (i = 1; i <= num_in_q_1; ++i)
         time_arrival_1[i] = time_arrival_1[i + 1];
 
-    printf("total of delays_1 : %11.3f / num_cuts_delayed _ 1:  %d\n", total_of_delays_1 , num_custs_delayed_1);
+    //printf("total of delays_1 : %11.3f / num_cuts_delayed _ 1:  %d\n", total_of_delays_1 , num_custs_delayed_1);
 }
 
 void attend_queue_2 (int event_type){
@@ -609,7 +627,7 @@ void attend_queue_2 (int event_type){
 
     for (i = 1; i <= num_in_q_2; ++i)
         time_arrival_2[i] = time_arrival_2[i + 1];
-    printf("total of delays_2 : %11.3f / num_cuts_delayed _ 2: %d\n", total_of_delays_2 , num_custs_delayed_2);
+    //printf("total of delays_2 : %11.3f / num_cuts_delayed _ 2: %d\n", total_of_delays_2 , num_custs_delayed_2);
 }
 
 
