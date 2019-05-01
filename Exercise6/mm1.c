@@ -37,18 +37,24 @@ float area_num_in_q_2, time_arrival_2[Q2_LIMIT + 1],
 
 /* Server A1*/
 int server_status_A1;
+int type_in_server_A1;
 float area_server_status_A1_type1;
 float area_server_status_A1_type2;
+float area_server_status_A1;
 
 /* Server A2*/
 int server_status_A2;
+int type_in_server_A2;
 float area_server_status_A2_type1;
 float area_server_status_A2_type2;
+float area_server_status_A2;
 
 /*Server B*/
 int server_status_B;
+int type_in_server_B;
 float area_server_status_B_type1;
 float area_server_status_B_type2;
+float area_server_status_B;
 
 
 FILE  *infile, *outfile;
@@ -149,7 +155,7 @@ main()  /* Main function. */
 void initialize(void)  /* Initialization function. */
 {
     /* Initialize the simulation clock. */
-    end_time = 500;
+    end_time = 1000;
     stop_simulation = 0;
     sim_time = 0.0;
 
@@ -288,6 +294,8 @@ void arrive(void)  /* Arrival event function. */
                 /* Schedule a departure from server A1 */
                 time_next_event[2] = sim_time + expon(mean_service_1);
 
+                type_in_server_A1 = 0;
+
             } else if (server_status_A2 == IDLE) {
                 //printf("     METIDO EN A2\n" );
                 /* SERVER A2 BUSY*/
@@ -296,6 +304,7 @@ void arrive(void)  /* Arrival event function. */
                 /* Schedule a departure from server A2 */
                 time_next_event[3] = sim_time + expon(mean_service_1);
 
+                type_in_server_A2 = 0;
             } else {
                // printf("     METIDO EN AB\n" );
                 /* SERVER B BUSY*/
@@ -303,6 +312,8 @@ void arrive(void)  /* Arrival event function. */
 
                 /* Schedule a departure from server B */
                 time_next_event[4] = sim_time + expon(mean_service_1);
+
+                type_in_server_B = 0;
             }
         } else {
             //printf("     TOCO ESPERAR\n" );
@@ -326,6 +337,9 @@ void arrive(void)  /* Arrival event function. */
                 server_status_B = BUSY;
                 server_status_A1 = BUSY;
 
+                type_in_server_B = 1;
+                type_in_server_A1 = 1;
+
                 /* Schedule a departure from server B A1. */
                 time_next_event[5] = sim_time + expon(get_mean_service_2());
             } else {
@@ -334,11 +348,13 @@ void arrive(void)  /* Arrival event function. */
                 server_status_B = BUSY;
                 server_status_A2 = BUSY;
 
+                type_in_server_B = 1;
+                type_in_server_A2 = 1;
+
                 /* Schedule a departure from server B A2. */
                 time_next_event[6] = sim_time + expon(get_mean_service_2());
             }
         } else {
-            printf("     ESPERA\n" );
             /* Servers are busy, so increment number of customers in queue type 2. */
             ++num_in_q_2;
             time_arrival_2[num_in_q_2] = sim_time;
@@ -362,11 +378,15 @@ void depart_A1(void)  /* Departure event function. */
         } else {
             /* Departure from A1 event */
             attend_queue_1(2);
+            type_in_server_A1 = 0;
         }
     } else {
         /* Departure from B A1  event */
         attend_queue_2(5);
         server_status_B = BUSY;
+
+        type_in_server_A1 = 1;
+        type_in_server_B = 1;
 
         /*** eliminate departure A1 event from consideration ***/
         time_next_event[2] = 1.0e+30;
@@ -387,11 +407,16 @@ void depart_A2(void)  /* Departure event function. */
         } else {
             /* Departure from A2 event */
             attend_queue_1(3);
+
+            type_in_server_A2 = 0;
         }
     } else {
         /* Departure from B A2  event */
         attend_queue_2(6);
         server_status_B = BUSY;
+
+        type_in_server_A2 = 1;
+        type_in_server_B = 1;
 
         /*** eliminate departure A2 event from consideration ***/
         time_next_event[3] = 1.0e+30;
@@ -409,14 +434,24 @@ void depart_B(void) {
         if (server_status_A1 == IDLE){
             /* Departure from B A1  event */
             attend_queue_2(5);
+
+            type_in_server_A1 = 1;
+            type_in_server_B = 1;
+
         } else {
             /* Departure from B A2  event */
             attend_queue_2(6);
+
+            type_in_server_A2 = 1;
+            type_in_server_B = 1;
         }
     } else if (num_in_q_1 != 0){
         /* Service type 1 client */
         /* Departure from B event */
         attend_queue_1(4);
+
+        type_in_server_B = 0;
+
     } else {
         server_status_B = IDLE;
         /*** eliminate departure B event from consideration ***/
@@ -446,6 +481,8 @@ void depart_B_A1 (void){
             /* Departure from A1 event */
             attend_queue_1(2);
 
+            type_in_server_A1 = 0;
+
             /* Check to see whether the queue type 1 is empty. */
             if (num_in_q_1 == 0){
                 server_status_B      = IDLE;
@@ -453,11 +490,16 @@ void depart_B_A1 (void){
             } else {
                 /* Departure from B event */
                 attend_queue_1(4);
+
+                type_in_server_B = 0;
             }
         }
     } else {
         /* Departure from B A1  event */
         attend_queue_2(5);
+
+        type_in_server_A1 = 1;
+        type_in_server_B = 1;
 
         /*** eliminate departure A1 event from consideration ***/
         time_next_event[2] = 1.0e+30;
@@ -486,6 +528,8 @@ void depart_B_A2 (void){
             /* Departure from A2 event */
             attend_queue_1(3);
 
+            type_in_server_A2 = 0;
+
             /* Check to see whether the queue type 1 is empty. */
             if (num_in_q_1 == 0){
                 server_status_B      = IDLE;
@@ -493,11 +537,16 @@ void depart_B_A2 (void){
             } else {
                 /* Departure from B event */
                 attend_queue_1(4);
+
+                type_in_server_B = 0;
             }
         }
     } else {
         /* Departure from B A2  event */
         attend_queue_2(6);
+
+        type_in_server_A2 = 1;
+        type_in_server_B = 1;
 
         /*** eliminate departure A2 event from consideration ***/
         time_next_event[3] = 1.0e+30;
@@ -506,14 +555,38 @@ void depart_B_A2 (void){
 
 void report(void)  /* Report generator function. */
 {
-    printf("total_of_delays_1: %5.5f\n", total_of_delays_1);
-    printf("area_num_in_q_1: %5.5f\n", area_num_in_q_1);
+    printf("total_of_delays_1: %d\n", num_custs_delayed_1);
+    printf("area_num_in_q_1: %d\n", num_custs_delayed_2);
     /* Compute and write estimates of desired measures of performance. */
     printf( "\n\n Demora Promedio en Q1 : %11.3f minutes\n\n",total_of_delays_1 / num_custs_delayed_1);
     printf( "Numero Promedio en Q1 %10.3f\n\n",area_num_in_q_1 / sim_time);
 
     printf( "\n\nDemora Promedio en Q2%11.3f minutes\n\n", total_of_delays_2 / num_custs_delayed_2);
     printf( "Numero Promedio en Q2 %10.3f\n\n", area_num_in_q_2 / sim_time);
+
+
+    printf("area server A1 : %.4f\n", area_server_status_A1);
+    printf("area server A1 type 1 : %.4f\n", area_server_status_A1_type1);
+    printf("area server A1 type 2 : %.4f\n", area_server_status_A1_type2);
+
+    printf("area server A2 : %.4f\n", area_server_status_A2);
+    printf("area server A2 type 1 : %.4f\n", area_server_status_A2_type1);
+    printf("area server A2 type 2 : %.4f\n", area_server_status_A2_type2);
+
+    printf("area server B : %.4f\n", area_server_status_B);
+    printf("area server B type 1 : %.4f\n", area_server_status_B_type1);
+    printf("area server B type 2 : %.4f\n", area_server_status_B_type2);
+
+
+    printf("Proporcion tiempo de A1 dedicada a cliente 1 : %.4f\n", area_server_status_A1_type1 / area_server_status_A1);
+    printf("Proporcion tiempo de A1 dedicada a cliente 2 : %.4f\n", area_server_status_A1_type2 / area_server_status_A1);
+
+    printf("Proporcion tiempo de A2 dedicada a cliente 1 : %.4f\n", area_server_status_A2_type1 / area_server_status_A2);
+    printf("Proporcion tiempo de A2 dedicada a cliente 2 : %.4f\n", area_server_status_A2_type2 / area_server_status_A2);
+
+    printf("Proporcion tiempo de B  dedicada a cliente 1 : %.4f\n", area_server_status_B_type1 / area_server_status_B);
+    printf("Proporcion tiempo de B  dedicada a cliente 2 : %.4f\n", area_server_status_B_type2 / area_server_status_B);
+
 
     /*printf( "Server 1 utilization%15.3f\n\n",
             area_server_status_1 / sim_time);*/
@@ -547,18 +620,23 @@ void update_time_avg_stats(void)  /* Update area accumulators for time-average
     area_server_status_2 += server_status_2 * time_since_last_event;
     */
 
-    float area_server_status_A1_type1;
-    float area_server_status_A1_type2;
+    /* Server A1*/
+    area_server_status_A1 += server_status_A1 * time_since_last_event;
+    area_server_status_A1_type1 += (!type_in_server_A1) * server_status_A1 * time_since_last_event;
+    area_server_status_A1_type2 += type_in_server_A1 * server_status_A1 * time_since_last_event;
+
 
     /* Server A2*/
-    int server_status_A2;
-    float area_server_status_A2_type1;
-    float area_server_status_A2_type2;
+    area_server_status_A2 += server_status_A2 * time_since_last_event;
+    area_server_status_A2_type1 += (!type_in_server_A2) * server_status_A2 * time_since_last_event;
+    area_server_status_A2_type2 +=  type_in_server_A2 * server_status_A2 * time_since_last_event;
+
 
     /*Server B*/
-    int server_status_B;
-    float area_server_status_B_type1;
-    float area_server_status_B_type2;
+    area_server_status_B += server_status_B * time_since_last_event;
+    area_server_status_B_type1 += (!type_in_server_B) * server_status_B * time_since_last_event;
+    area_server_status_B_type2 +=  type_in_server_B *server_status_B * time_since_last_event;
+
 
 }
 
