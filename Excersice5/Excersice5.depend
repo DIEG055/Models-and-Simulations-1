@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1556388373 source:c:\users\asus\documents\modelos\models-and-simulations-1\excersice5\lcgrand.c
+
+1556911578 source:c:\users\asus\documents\modelos\models-and-simulations-1\excersice5\mm1.c
+	<stdio.h>
+	<math.h>
+	"lcgrand.h"
+
+1556388373 c:\users\asus\documents\modelos\models-and-simulations-1\excersice5\lcgrand.h
+	"lcgrand.h"
+
