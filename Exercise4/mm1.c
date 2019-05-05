@@ -5,6 +5,14 @@
 
 #define BUSY      1 /*Server BUSY*/
 #define IDLE      0 /*sERVER iDLE*/
+/*Different mean*/
+int TOTAL_SEED =100;
+
+int CUSTOMERS_IN_SYSTEM,CUSTOMERS_ATTENDED_SERVER_1,SEED;
+float AVERAGE_DELAY_Q1,AVERAGE_NUMBER_Q1, SERVER_UTILIZATION_1;
+float AVERAGE_DELAY_Q2,AVERAGE_NUMBER_Q2, SERVER_UTILIZATION_2;
+
+
 
 /*General*/
 int   next_event_type, num_events,stop_simulation, end_time;
@@ -43,7 +51,7 @@ main()  /* Main function. */
     /* Open input and output files. */
     infile  = fopen("mm1.in",  "r");
     outfile = fopen("mm1.out", "w");
-
+    SEED = 1;
     /* Specify the number of events for the timing function. */
     num_events = 3;
 
@@ -59,36 +67,49 @@ main()  /* Main function. */
     fprintf(outfile, "Mean service 2 time:1%16.3f hours\n\n", mean_service_2);
     fprintf(outfile, "-----------------------------------------------\n\n", mean_service_2);
     /* Initialize the simulation. */
-    initialize();
 
+CUSTOMERS_IN_SYSTEM=0;
+CUSTOMERS_ATTENDED_SERVER_1=0;
+AVERAGE_DELAY_Q1=0.0;
+AVERAGE_NUMBER_Q1=0.0;
+SERVER_UTILIZATION_1=0.0;
+AVERAGE_DELAY_Q2=0.0;
+AVERAGE_NUMBER_Q2=0.0;
+SERVER_UTILIZATION_2=0.0;
 
     /* Run the simulation while simulation time is less than. */
-    while(sim_time < end_time )
-    {
-        timing();
-        if(stop_simulation == 1){
-            break;
-        }
-        /* Update time-average statistical accumulators. */
-        update_time_avg_stats();
+    for(SEED=1;SEED<=TOTAL_SEED;SEED++){
 
-        /* Invoke the appropriate event function. */
-        switch (next_event_type)
+        initialize();
+        while(sim_time < end_time )
         {
-            case 1:
-                arrive();
+            timing();
+            if(stop_simulation == 1){
                 break;
-            case 2:
-                depart_installation_1 ();
-                break;
-            case 3:
-                depart_installation_2 ();
-                break;
+            }
+            /* Update time-average statistical accumulators. */
+            update_time_avg_stats();
+
+            /* Invoke the appropriate event function. */
+            switch (next_event_type)
+            {
+                case 1:
+                    arrive();
+                    break;
+                case 2:
+                    depart_installation_1 ();
+                    break;
+                case 3:
+                    depart_installation_2 ();
+                    break;
+            }
+
         }
+        report();
     }
 
     /* Invoke the report generator and end the simulation. */
-    report();
+    general_report();
     fclose(infile);
     fclose(outfile);
 
@@ -125,7 +146,7 @@ void initialize(void)  /* Initialization function. */
 
     /* Initialize event list.  Since no customers are present, the departure
        (service completion) event is eliminated from consideration. */
-    time_next_event[1] = sim_time + expon(mean_interarrival);
+    time_next_event[1] = sim_time + poisson(mean_interarrival);
     time_next_event[2] = 1.0e+30;
     time_next_event[3] = 1.0e+30;
 }
@@ -185,7 +206,7 @@ void arrive(void)  /* Server 2 Arrival Event Function */
     float delay_1;
 
     /* Schedule next arrival. */
-    time_next_event[1] = sim_time + expon(mean_interarrival);
+    time_next_event[1] = sim_time + poisson(mean_interarrival);
 
     /* Check to see whether server is busy. */
     if (server_status_1 == BUSY)
@@ -214,7 +235,7 @@ void arrive(void)  /* Server 2 Arrival Event Function */
     }
 }
 
-void depart_installation_1(void)  /* Server 1 Departure Event Function. */
+void depart_installation_1()  /* Server 1 Departure Event Function. */
 {
     int   i;
     float delay;
@@ -247,7 +268,7 @@ void depart_installation_1(void)  /* Server 1 Departure Event Function. */
     }
 }
 
-void depart_installation_2(void)   /* Server 2 Departure Event Function. */
+void depart_installation_2()   /* Server 2 Departure Event Function. */
 {
     int   i;
     float delay;
@@ -280,9 +301,28 @@ void depart_installation_2(void)   /* Server 2 Departure Event Function. */
     }
 }
 
+void general_report(void){
+    printf("CUSTOMERS_IN_SYSTEM: %d\n",CUSTOMERS_IN_SYSTEM/TOTAL_SEED);
+    printf("CUSTOMERS_ATTENDED_SERVER_1: %d\n",CUSTOMERS_ATTENDED_SERVER_1/TOTAL_SEED);
+    printf("AVERAGE_DELAY_Q1:%11.3f\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
+    printf("AVERAGE_NUMBER_Q1: %11.3f\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
+    printf("SERVER_UTILIZATION_1: %11.3f\n",SERVER_UTILIZATION_1/TOTAL_SEED);
+    printf("AVERAGE_DELAY_Q2: %11.3f\n",AVERAGE_DELAY_Q2/TOTAL_SEED);
+    printf("AVERAGE_NUMBER_Q2: %11.3f\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
+    printf("SERVER_UTILIZATION_2: %11.3f\n",SERVER_UTILIZATION_2/TOTAL_SEED);
+
+}
+
 void report(void)  /* Report generator function. */
 {
-
+CUSTOMERS_IN_SYSTEM+=num_custs_delayed_1+num_custs_delayed_2;
+CUSTOMERS_ATTENDED_SERVER_1+=num_custs_delayed_1;
+AVERAGE_DELAY_Q1+=(total_of_delays_1 / num_custs_delayed_1);
+AVERAGE_NUMBER_Q1+=(area_num_in_q_1 / sim_time);
+SERVER_UTILIZATION_1+=(area_server_status_1 / sim_time);
+AVERAGE_DELAY_Q2+=(total_of_delays_2 / num_custs_delayed_2);
+AVERAGE_NUMBER_Q2+=(area_num_in_q_2 / sim_time);
+SERVER_UTILIZATION_2+=(area_server_status_2 / sim_time);
     /* Compute and write estimates of desired measures of performance. */
     fprintf(outfile,"Total Customers in system: %d \n\n", num_custs_delayed_1+num_custs_delayed_2);
     fprintf(outfile,"Total Customers Attended in server 1: %d\n\n\n", num_custs_delayed_1);
@@ -322,23 +362,15 @@ void update_time_avg_stats(void)
     area_server_status_2 += server_status_2 * time_since_last_event;
 }
 
-float poisson(float lambda) {
-  float L = exp(-lambda);
-  float p = 1.0;
-  float k = 0;
-
-  do {
-    k++;
-    p *= lcgrand(1);
-  } while (p > L);
-
-  return k - 1;
+float poisson(float mean) {
+  return (1/mean)*exp(-(lcgrand(SEED)/mean));
 }
 
 float expon(float mean)  /* Exponential variate generation function. */
 {
     /* Return an exponential random variate with mean "mean". */
-    return -mean * log(lcgrand(1));
+    return -mean * log(lcgrand(SEED));
+
 }
 
 
