@@ -5,10 +5,8 @@
 
 #define BUSY      1
 #define IDLE      0
-
 #define TOTAL_PRINTERS  3
 #define TOTAL_EMPLOYEES 1
-
 #define Q_LIMIT 100000
 
 
@@ -79,20 +77,14 @@ main()  /* Main function. */
 
     /* Read input parameters. */
 
-    /*fscanf(infile, "%f %f %f", &mean_interarrival, &mean_service_1,
-           &mean_service_2);*/
+    fscanf(infile,"%f %f %f %f %f %f %f %f %f", &mean_interarrival_t1, &mean_interarrival_t2,&mean_interarrival_t3,
+                                     &mean_service_printer_t1, &mean_service_printer_t2, &mean_service_printer_t3,
+                                     &mean_service_employee_t1,&mean_service_employee_t2,&mean_service_employee_t3);
 
-    mean_interarrival_t1 =  15;     // 4 papers / hour
-    mean_interarrival_t2 =  7.5;    // 8 papers / hour
-    mean_interarrival_t3 =  3.75;   // 16 papers / hour
+    mean_interarrival_t1 =  60/mean_interarrival_t1;     // 4 papers / hour
+    mean_interarrival_t2 = 60/mean_interarrival_t2;    // 8 papers / hour
+    mean_interarrival_t3 =  60/mean_interarrival_t3;   // 16 papers / hour
 
-    mean_service_printer_t1 = 12;
-    mean_service_printer_t2 = 15;
-    mean_service_printer_t3 = 1;
-
-    mean_service_employee_t1 = 3;
-    mean_service_employee_t2 = 6;
-    mean_service_employee_t3 = 10;
 
    /* Initialize the simulation. */
 
@@ -100,7 +92,6 @@ main()  /* Main function. */
 
     /* Run the simulation while more delays are still needed. */
 
-    /*while (num_in_q1 < Q1_LIMIT)*/
     while(sim_time < end_time )
     {
         /* Determine the next event. */
@@ -351,7 +342,7 @@ void depart_printer(int number)  /* Departure event function. */
 
         printers[ number ].paper_inside = type;
 
-        // time_next_event[2] = sim_time + expon(mean_service_1);
+
         /* Schedule a departure (service completion). */
         switch (type)
         {
@@ -438,29 +429,29 @@ void report(void)  /* Report generator function. */
 {
     /* Compute and write estimates of desired measures of performance. */
 
-    printf( "\n\nAverage delay in queue 1 %11.3f minutes\n\n",
+    fprintf(outfile, "\n\nAverage delay in queue 1 %11.3f minutes\n\n",
             total_of_delays_1 / num_custs_delayed_1);
-    printf( "Average number in queue 1 %10.3f\n\n",
+    fprintf(outfile, "Average number in queue 1 %10.3f\n\n",
             area_num_in_q_1 / sim_time);
 
-    printf( "\n\nAverage delay in queue 2 %11.3f minutes\n\n",
+    fprintf(outfile, "\n\nAverage delay in queue 2 %11.3f minutes\n\n",
             total_of_delays_2 / num_custs_delayed_2);
-    printf( "Average number in queue 2 %10.3f\n\n",
+    fprintf(outfile, "Average number in queue 2 %10.3f\n\n\n",
             area_num_in_q_2 / sim_time);
-    //printf( "Server 2 utilization%15.3f\n\n", area_server_status_2 / sim_time);
 
-    printf( "Printers\n\n");
+
+    fprintf(outfile, "Printers\n\n");
     for (int i = 1 ;  i <= TOTAL_PRINTERS ;  i++){
-        printf( "Printer #%d utilization : %15.3f\n", i , printers[i].area_server_status / sim_time );
+        fprintf(outfile, "Printer #%d utilization : %15.3f\n", i , printers[i].area_server_status / sim_time );
     }
 
-    printf( "\n\nEmployees\n\n");
+    fprintf(outfile, "\n\nEmployees\n\n");
     for (int i = 1 ;  i <= TOTAL_EMPLOYEES ;  i++){
-        printf( "Employee #%d utilization : %15.3f\n", i , employees[i].area_server_status / sim_time );
+        fprintf(outfile, "Employee #%d utilization : %15.3f\n", i , employees[i].area_server_status / sim_time );
     }
 
 
-    printf( "\n\nTime simulation ended%12.3f minutes\n\n", sim_time);
+    fprintf(outfile, "\n\nTime simulation ended%12.3f minutes\n\n", sim_time);
 }
 
 
