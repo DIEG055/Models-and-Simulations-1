@@ -1,0 +1,32 @@
+System Inputs Exercise 1.4
+
+Mean interarrival time:      0.100 hours
+
+Mean service 1 time:1           0.700 hours
+
+Mean service 2 time:1           0.500 hours
+
+-----------------------------------------------
+
+Total Customers in system: 1179 
+
+Total Customers Attended in server 1: 485
+
+
+Average delay in queue 1       6.037 hours
+
+Average number in queue 1      8.821
+
+Server 1 utilization          1.000
+
+
+
+Average delay in queue 2     131.231 hours
+
+Average number in queue 2   1105.790
+
+Server 2 utilization          0.997
+
+
+Time simulation ended     335.977 hours(336 hours = 2 Weeks)
+
