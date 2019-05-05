@@ -9,8 +9,7 @@
 #define TOTAL_PRINTERS  3
 #define TOTAL_EMPLOYEES 1
 
-#define Q1_LIMIT 100000
-#define Q2_LIMIT 100000
+#define Q_LIMIT 100000
 
 
 
@@ -48,12 +47,12 @@ struct queue_item {
 /*Queue 1*/
 int num_custs_delayed_1, num_in_q_1;
 float area_num_in_q_1,total_of_delays_1;
-struct queue_item queue_1[Q1_LIMIT + 1];
+struct queue_item queue_1[Q_LIMIT + 1];
 
 /*Queue 2*/
 int num_custs_delayed_2,num_in_q_2;
 float area_num_in_q_2 ,total_of_delays_2;
-struct queue_item queue_2[Q2_LIMIT + 1];
+struct queue_item queue_2[Q_LIMIT + 1];
 
 
 FILE  *infile, *outfile;
@@ -72,11 +71,10 @@ float expon(float mean);
 main()  /* Main function. */
 {
     /* Open input and output files. */
-
-
+    infile  = fopen("mm1.in",  "r");
+    outfile = fopen("mm1.out", "w");
 
     /* Specify the number of events for the timing function. */
-    infile  = fopen("mm1.in",  "r");
     num_events = 3 + TOTAL_PRINTERS  + TOTAL_EMPLOYEES;
 
     /* Read input parameters. */

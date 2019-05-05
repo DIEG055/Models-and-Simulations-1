@@ -96,7 +96,6 @@ main()  /* Main function. */
     return 0;
 }
 
-
 void initialize(void)  /* Initialization function. */
 {
     /* Initialize the simulation clock. */
@@ -130,7 +129,6 @@ void initialize(void)  /* Initialization function. */
     time_next_event[2] = 1.0e+30;
     time_next_event[3] = 1.0e+30;
 }
-
 
 void timing(void)  /* Timing function. */
 {
@@ -182,7 +180,6 @@ void arrive2(void){/* Server 2 Arrival Event Function*/
     }
 };
 
-
 void arrive(void)  /* Server 2 Arrival Event Function */
 {
     float delay_1;
@@ -216,7 +213,6 @@ void arrive(void)  /* Server 2 Arrival Event Function */
         time_next_event[2] = sim_time + expon(mean_service_1);
     }
 }
-
 
 void depart_installation_1(void)  /* Server 1 Departure Event Function. */
 {
@@ -284,7 +280,6 @@ void depart_installation_2(void)   /* Server 2 Departure Event Function. */
     }
 }
 
-
 void report(void)  /* Report generator function. */
 {
 
@@ -310,9 +305,7 @@ void report(void)  /* Report generator function. */
 
 }
 
-
-void update_time_avg_stats(void)  /* Update area accumulators for time-average
-                                     statistics. */
+void update_time_avg_stats(void)
 {
     float time_since_last_event;
 

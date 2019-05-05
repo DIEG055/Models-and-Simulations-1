@@ -31,9 +31,17 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="main.c">
+		<Unit filename="Excersice5.cbp" />
+		<Unit filename="Excersice5.depend" />
+		<Unit filename="lcgrand.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="lcgrand.h" />
+		<Unit filename="mm1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="mm1.in" />
+		<Unit filename="mm1.out" />
 		<Extensions>
 			<code_completion />
 			<envvars />
