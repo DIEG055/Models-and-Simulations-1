@@ -8,8 +8,11 @@
 #define TOTAL_PRINTERS  3
 #define TOTAL_EMPLOYEES 1
 #define Q_LIMIT 100000
-
-
+int TOTAL_SEED=15;
+int SEED;
+/*Acumulators for multiple iteratations with different seeds*/
+float AVERAGE_DELAY_Q1,AVERAGE_NUMBER_Q1,AVERAGE_DELAY_Q2,AVERAGE_NUMBER_Q2;
+float PRINTER_UTILIZATION[1+TOTAL_PRINTERS],EMPLOYEE_UTILIZATION[1+TOTAL_EMPLOYEES];
 
 /*General*/
 int   next_event_type, num_events,num_units_attended,stop_simulation, end_time;
@@ -74,6 +77,8 @@ main()  /* Main function. */
 
     /* Specify the number of events for the timing function. */
     num_events = 3 + TOTAL_PRINTERS  + TOTAL_EMPLOYEES;
+    SEED = 1;
+
 
     /* Read input parameters. */
 
@@ -88,11 +93,11 @@ main()  /* Main function. */
 
    /* Initialize the simulation. */
 
-    initialize();
 
     /* Run the simulation while more delays are still needed. */
-
-    while(sim_time < end_time )
+    for(SEED=1;SEED<=TOTAL_SEED;SEED++){
+        initialize();
+        while(sim_time < end_time )
     {
         /* Determine the next event. */
 
@@ -113,11 +118,12 @@ main()  /* Main function. */
             depart_employee(next_event_type - 3 - TOTAL_PRINTERS);
         }
     }
-
-    /* Invoke the report generator and end the simulation. */
-
-    fclose(infile);
     report();
+    }
+    /* Invoke the report generator and end the simulation. */
+    general_report();
+    fclose(infile);
+    fclose(outfile);
 
     return 0;
 }
@@ -424,34 +430,40 @@ void depart_employee (int number)  /* Departure event function. */
     }
 }
 
+void general_report(void){
+    fprintf(outfile,"AVERAGE_DELAY_Q1: %11.3f\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
+    fprintf(outfile,"AVERAGE_NUMBER_Q1: %11.3f\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
+    fprintf(outfile,"AVERAGE_DELAY_Q2: %11.3f\n",AVERAGE_DELAY_Q2/TOTAL_SEED);
+    fprintf(outfile,"AVERAGE_NUMBER_Q2: %11.3f\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
 
+    for (int i = 1 ;  i <= TOTAL_PRINTERS ;  i++){
+           fprintf(outfile, "Printer #%d utilization : %15.3f\n", i , PRINTER_UTILIZATION[i]/TOTAL_SEED);
+        }
+    for (int i = 1 ;  i <= TOTAL_EMPLOYEES ;  i++){
+           fprintf(outfile, "Employee #%d utilization : %15.3f\n", i , EMPLOYEE_UTILIZATION[i]/TOTAL_SEED);
+        }
+}
 void report(void)  /* Report generator function. */
 {
     /* Compute and write estimates of desired measures of performance. */
+    AVERAGE_DELAY_Q1+=(total_of_delays_1 / num_custs_delayed_1);
+    AVERAGE_NUMBER_Q1+=(area_num_in_q_1 / sim_time);
+    AVERAGE_DELAY_Q2+=(total_of_delays_2 / num_custs_delayed_2);
+    AVERAGE_NUMBER_Q2+=(area_num_in_q_2 / sim_time);
 
-    fprintf(outfile, "\n\nAverage delay in queue 1 %11.3f minutes\n\n",
-            total_of_delays_1 / num_custs_delayed_1);
-    fprintf(outfile, "Average number in queue 1 %10.3f\n\n",
-            area_num_in_q_1 / sim_time);
-
-    fprintf(outfile, "\n\nAverage delay in queue 2 %11.3f minutes\n\n",
-            total_of_delays_2 / num_custs_delayed_2);
-    fprintf(outfile, "Average number in queue 2 %10.3f\n\n\n",
-            area_num_in_q_2 / sim_time);
-
-
-    fprintf(outfile, "Printers\n\n");
     for (int i = 1 ;  i <= TOTAL_PRINTERS ;  i++){
-        fprintf(outfile, "Printer #%d utilization : %15.3f\n", i , printers[i].area_server_status / sim_time );
+        PRINTER_UTILIZATION[i]+= (printers[i].area_server_status / sim_time );
+        printf("Printer #%d utilization : %15.3f\n", i , printers[i].area_server_status / sim_time );
     }
 
-    fprintf(outfile, "\n\nEmployees\n\n");
+    /*fprintf(outfile, "\n\nEmployees\n\n");*/
     for (int i = 1 ;  i <= TOTAL_EMPLOYEES ;  i++){
-        fprintf(outfile, "Employee #%d utilization : %15.3f\n", i , employees[i].area_server_status / sim_time );
+        EMPLOYEE_UTILIZATION[i]+=(employees[i].area_server_status / sim_time );
+       //printf("Employee #%d utilization : %15.3f\n", i , employees[i].area_server_status / sim_time );
     }
 
 
-    fprintf(outfile, "\n\nTime simulation ended%12.3f minutes\n\n", sim_time);
+   /* fprintf(outfile, "\n\nTime simulation ended%12.3f minutes\n\n", sim_time);*/
 }
 
 
@@ -484,5 +496,5 @@ void update_time_avg_stats(void)  /* Update area accumulators for time-average
 float expon(float mean)  /* Exponential variate generation function. */
 {
     /* Return an exponential random variate with mean "mean". */
-    return -mean * log(lcgrand(1));
+    return -mean * log(lcgrand(SEED));
 }

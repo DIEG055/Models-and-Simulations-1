@@ -1,27 +1,8 @@
-
-
-Average delay in queue 1      80.717 minutes
-
-Average number in queue 1     38.839
-
-
-
-Average delay in queue 2    1175.571 minutes
-
-Average number in queue 2    478.623
-
-
-Printers
-
-Printer #1 utilization :           0.984
-Printer #2 utilization :           0.988
-Printer #3 utilization :           0.977
-
-
-Employees
-
-Employee #1 utilization :           0.996
-
-
-Time simulation ended    2998.742 minutes
-
+AVERAGE_DELAY_Q1:      82.553
+AVERAGE_NUMBER_Q1:      38.256
+AVERAGE_DELAY_Q2:    1328.506
+AVERAGE_NUMBER_Q2:     464.333
+Printer #1 utilization :           0.976
+Printer #2 utilization :           0.965
+Printer #3 utilization :           0.951
+Employee #1 utilization :           0.998

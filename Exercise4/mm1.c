@@ -8,6 +8,7 @@
 /*Different mean*/
 int TOTAL_SEED =100;
 
+/*Variables used for save data, when the simulation use Many Seeds. */
 int CUSTOMERS_IN_SYSTEM,CUSTOMERS_ATTENDED_SERVER_1,SEED;
 float AVERAGE_DELAY_Q1,AVERAGE_NUMBER_Q1, SERVER_UTILIZATION_1;
 float AVERAGE_DELAY_Q2,AVERAGE_NUMBER_Q2, SERVER_UTILIZATION_2;
@@ -68,14 +69,14 @@ main()  /* Main function. */
     fprintf(outfile, "-----------------------------------------------\n\n", mean_service_2);
     /* Initialize the simulation. */
 
-CUSTOMERS_IN_SYSTEM=0;
-CUSTOMERS_ATTENDED_SERVER_1=0;
-AVERAGE_DELAY_Q1=0.0;
-AVERAGE_NUMBER_Q1=0.0;
-SERVER_UTILIZATION_1=0.0;
-AVERAGE_DELAY_Q2=0.0;
-AVERAGE_NUMBER_Q2=0.0;
-SERVER_UTILIZATION_2=0.0;
+    CUSTOMERS_IN_SYSTEM=0;
+    CUSTOMERS_ATTENDED_SERVER_1=0;
+    AVERAGE_DELAY_Q1=0.0;
+    AVERAGE_NUMBER_Q1=0.0;
+    SERVER_UTILIZATION_1=0.0;
+    AVERAGE_DELAY_Q2=0.0;
+    AVERAGE_NUMBER_Q2=0.0;
+    SERVER_UTILIZATION_2=0.0;
 
     /* Run the simulation while simulation time is less than. */
     for(SEED=1;SEED<=TOTAL_SEED;SEED++){
@@ -315,14 +316,16 @@ void general_report(void){
 
 void report(void)  /* Report generator function. */
 {
-CUSTOMERS_IN_SYSTEM+=num_custs_delayed_1+num_custs_delayed_2;
-CUSTOMERS_ATTENDED_SERVER_1+=num_custs_delayed_1;
-AVERAGE_DELAY_Q1+=(total_of_delays_1 / num_custs_delayed_1);
-AVERAGE_NUMBER_Q1+=(area_num_in_q_1 / sim_time);
-SERVER_UTILIZATION_1+=(area_server_status_1 / sim_time);
-AVERAGE_DELAY_Q2+=(total_of_delays_2 / num_custs_delayed_2);
-AVERAGE_NUMBER_Q2+=(area_num_in_q_2 / sim_time);
-SERVER_UTILIZATION_2+=(area_server_status_2 / sim_time);
+    /*Sum the Results in each iteration*/
+    CUSTOMERS_IN_SYSTEM+=num_custs_delayed_1+num_custs_delayed_2;
+    CUSTOMERS_ATTENDED_SERVER_1+=num_custs_delayed_1;
+    AVERAGE_DELAY_Q1+=(total_of_delays_1 / num_custs_delayed_1);
+    AVERAGE_NUMBER_Q1+=(area_num_in_q_1 / sim_time);
+    SERVER_UTILIZATION_1+=(area_server_status_1 / sim_time);
+    AVERAGE_DELAY_Q2+=(total_of_delays_2 / num_custs_delayed_2);
+    AVERAGE_NUMBER_Q2+=(area_num_in_q_2 / sim_time);
+    SERVER_UTILIZATION_2+=(area_server_status_2 / sim_time);
+
     /* Compute and write estimates of desired measures of performance. */
     fprintf(outfile,"Total Customers in system: %d \n\n", num_custs_delayed_1+num_custs_delayed_2);
     fprintf(outfile,"Total Customers Attended in server 1: %d\n\n\n", num_custs_delayed_1);
