@@ -431,10 +431,10 @@ void depart_employee (int number)  /* Departure event function. */
 }
 
 void general_report(void){
-    fprintf(outfile,"AVERAGE_DELAY_Q1: %11.3f\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
-    fprintf(outfile,"AVERAGE_NUMBER_Q1: %11.3f\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
-    fprintf(outfile,"AVERAGE_DELAY_Q2: %11.3f\n",AVERAGE_DELAY_Q2/TOTAL_SEED);
-    fprintf(outfile,"AVERAGE_NUMBER_Q2: %11.3f\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
+    fprintf(outfile,"AVERAGE_DELAY_Q1(wait for print): %11.3f minutes\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
+    fprintf(outfile,"AVERAGE_NUMBER_Q1: %11.3f minutes\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
+    fprintf(outfile,"AVERAGE_DELAY_Q2(wait for inspection): %11.3f minutes\n",AVERAGE_DELAY_Q2/TOTAL_SEED);
+    fprintf(outfile,"AVERAGE_NUMBER_Q2: %11.3f minutes\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
 
     for (int i = 1 ;  i <= TOTAL_PRINTERS ;  i++){
            fprintf(outfile, "Printer #%d utilization : %15.3f\n", i , PRINTER_UTILIZATION[i]/TOTAL_SEED);
@@ -453,17 +453,17 @@ void report(void)  /* Report generator function. */
 
     for (int i = 1 ;  i <= TOTAL_PRINTERS ;  i++){
         PRINTER_UTILIZATION[i]+= (printers[i].area_server_status / sim_time );
-        printf("Printer #%d utilization : %15.3f\n", i , printers[i].area_server_status / sim_time );
+
     }
 
     /*fprintf(outfile, "\n\nEmployees\n\n");*/
     for (int i = 1 ;  i <= TOTAL_EMPLOYEES ;  i++){
         EMPLOYEE_UTILIZATION[i]+=(employees[i].area_server_status / sim_time );
-       //printf("Employee #%d utilization : %15.3f\n", i , employees[i].area_server_status / sim_time );
+
     }
 
 
-   /* fprintf(outfile, "\n\nTime simulation ended%12.3f minutes\n\n", sim_time);*/
+
 }
 
 

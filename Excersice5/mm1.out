@@ -1,7 +1,7 @@
-AVERAGE_DELAY_Q1:      82.553
-AVERAGE_NUMBER_Q1:      38.256
-AVERAGE_DELAY_Q2:    1328.506
-AVERAGE_NUMBER_Q2:     464.333
+AVERAGE_DELAY_Q1(wait for print):      82.553 minutes
+AVERAGE_NUMBER_Q1:      38.256 minutes
+AVERAGE_DELAY_Q2(wait for inspection):    1328.506 minutes
+AVERAGE_NUMBER_Q2:     464.333 minutes
 Printer #1 utilization :           0.976
 Printer #2 utilization :           0.965
 Printer #3 utilization :           0.951

@@ -8,6 +8,14 @@
 #define BUSY      1
 #define IDLE      0
 
+/*Variables used for save data, when the simulation use Many Seeds. */
+int SEED;
+int TOTAL_SEEDS = 10;
+float  AVERAGE_DELAY_Q1,AVERAGE_NUMBER_Q1,AVERAGE_DELAY_Q2,AVERAGE_NUMBER_Q2,
+    PROPORTION_SERVER_A1_CLIENT_1,PROPORTION_SERVER_A1_CLIENT_2,PROPORTION_SERVER_A2_CLIENT_1,
+    PROPORTION_SERVER_A2_CLIENT_2,PROPORTION_SERVER_B_CLIENT_1,PROPORTION_SERVER_B_CLIENT_2,
+    SERVER_UTILIZATION_A1,SERVER_UTILIZATION_A2,SERVER_UTILIZATION_B;
+
 /*General*/
 int   next_event_type, num_events,num_units_attended,
         stop_simulation, end_time;
@@ -78,60 +86,69 @@ bool is_there_any_serverA_idle(void);
 float get_mean_service_2(void);
 void attend_queue_1 (int event_type);
 void attend_queue_2 (int event_type);
-
+void general_report(void);
 main()  /* Main function. */
 {
     /* Specify the number of events for the timing function. */
     infile  = fopen("mm1.in",  "r");
     outfile = fopen("mm1.out", "w");
     num_events = 6;
-
+    AVERAGE_DELAY_Q1=0;
+    AVERAGE_NUMBER_Q1=0;
+    AVERAGE_DELAY_Q2=0;
+    AVERAGE_NUMBER_Q2=0;
+    PROPORTION_SERVER_A1_CLIENT_1=0;
+    PROPORTION_SERVER_A1_CLIENT_2=0;
+    PROPORTION_SERVER_A2_CLIENT_1=0;
+    PROPORTION_SERVER_A2_CLIENT_2=0;
+    PROPORTION_SERVER_B_CLIENT_1=0;
+    PROPORTION_SERVER_B_CLIENT_2=0;
+    SERVER_UTILIZATION_A1=0;
+    SERVER_UTILIZATION_A2=0;
+    SERVER_UTILIZATION_B=0;
+    SEED=1;
     /* Read input parameters. */
     fscanf(infile, "%f %f %f %f %f %f", &mean_interarrival, &probability_type1_client,
            &probability_type2_client, &mean_service_1, &mean_service_2_lower, &mean_service_2_upper);
 
     /* Initialize the simulation. */
-    initialize();
-
-    while(sim_time < end_time )
-    {
-        /* Determine the next event. */
-
-        timing();
-        if(stop_simulation == 1){
-            break;
-        }
-        /* Update time-average statistical accumulators. */
-
-        update_time_avg_stats();
-
-        /* Invoke the appropriate event function. */
-
-        switch (next_event_type)
+    for(SEED=1;SEED<=TOTAL_SEEDS;SEED++){
+        initialize();
+        while(sim_time < end_time )
         {
-            case 1:
-                arrive();
+           timing();
+            if(stop_simulation == 1){
                 break;
-            case 2:
-                depart_A1();
-                break;
-            case 3:
-                depart_A2();
-                break;
-            case 4:
-                depart_B();
-                break;
-            case 5:
-                depart_B_A1();
-                break;
-            case 6:
-                depart_B_A2();
-                break;
-        }
-    }
+            }
+            /* Update time-average statistical accumulators. */
+            update_time_avg_stats();
 
-    /* Invoke the report generator and end the simulation. */
-    report();
+            /* Invoke the appropriate event function. */
+            switch (next_event_type)
+            {
+                case 1:
+                    arrive();
+                    break;
+                case 2:
+                    depart_A1();
+                    break;
+                case 3:
+                    depart_A2();
+                    break;
+                case 4:
+                    depart_B();
+                    break;
+                case 5:
+                    depart_B_A1();
+                    break;
+                case 6:
+                    depart_B_A2();
+                    break;
+            }
+        }
+        report();
+    }
+    general_report();
     fclose(infile);
     fclose(outfile);
     return 0;
@@ -483,9 +500,38 @@ void depart_B_A2 (void){
         time_next_event[3] = 1.0e+30;
     }
 }
-
+void general_report(void){
+    fprintf(outfile,"AVERAGE_DELAY_Q1: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"AVERAGE_NUMBER_Q1: %11.3f minutes\n\n",AVERAGE_NUMBER_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"AVERAGE_DELAY_Q2: %11.3f minutes\n\n",AVERAGE_DELAY_Q2/TOTAL_SEEDS);
+    fprintf(outfile,"AVERAGE_NUMBER_Q2: %11.3f minutes\n\n",AVERAGE_NUMBER_Q2/TOTAL_SEEDS);
+    fprintf(outfile,"PROPORTION_SERVER_A1_CLIENT_1: %11.3f minutes\n\n",PROPORTION_SERVER_A1_CLIENT_1/TOTAL_SEEDS);
+    fprintf(outfile,"PROPORTION_SERVER_A1_CLIENT_2: %11.3f minutes\n\n",PROPORTION_SERVER_A1_CLIENT_2/TOTAL_SEEDS);
+    fprintf(outfile,"PROPORTION_SERVER_A2_CLIENT_1: %11.3f minutes\n\n",PROPORTION_SERVER_A2_CLIENT_1/TOTAL_SEEDS);
+    fprintf(outfile,"PROPORTION_SERVER_A2_CLIENT_2: %11.3f minutes\n\n",PROPORTION_SERVER_A2_CLIENT_2/TOTAL_SEEDS);
+    fprintf(outfile,"PROPORTION_SERVER_B_CLIENT_1: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"PROPORTION_SERVER_B_CLIENT_2: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"SERVER_UTILIZATION_A1: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"SERVER_UTILIZATION_A2: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"SERVER_UTILIZATION_B: %11.3f minutes\n\n",SERVER_UTILIZATION_B/TOTAL_SEEDS);
+}
 void report(void)  /* Report generator function. */
 {
+        AVERAGE_DELAY_Q1+=(total_of_delays_1 / num_custs_delayed_1);
+        AVERAGE_NUMBER_Q1+=(area_num_in_q_1 / sim_time);
+        AVERAGE_DELAY_Q2+=(total_of_delays_2 / num_custs_delayed_2);
+        AVERAGE_NUMBER_Q2+= (area_num_in_q_2 / sim_time);
+        PROPORTION_SERVER_A1_CLIENT_1+=(area_server_status_A1_type1 / area_server_status_A1);
+        PROPORTION_SERVER_A1_CLIENT_2+=(area_server_status_A1_type2 / area_server_status_A1);
+        PROPORTION_SERVER_A2_CLIENT_1+=(area_server_status_A2_type1 / area_server_status_A2);
+        PROPORTION_SERVER_A2_CLIENT_2+=(area_server_status_A2_type2 / area_server_status_A2);
+        PROPORTION_SERVER_B_CLIENT_1+=(area_server_status_B_type1 / area_server_status_B);
+        PROPORTION_SERVER_B_CLIENT_2+=(area_server_status_B_type2 / area_server_status_B);
+        SERVER_UTILIZATION_A1+=(area_server_status_A1 / sim_time);
+        SERVER_UTILIZATION_A2+=(area_server_status_A2 / sim_time);
+        SERVER_UTILIZATION_B+=(area_server_status_B / sim_time);
+
+
     /* Compute and write estimates of desired measures of performance. */
     printf( "------ Contadores estadisticos de cola Q1 ------\n");
     printf( "Demora promedio de clientes en cola : %10.4f minutos\n",total_of_delays_1 / num_custs_delayed_1);
@@ -513,7 +559,7 @@ void report(void)  /* Report generator function. */
     printf( "Termino del reloj de la simulacion%12.3f minutos\n\n", sim_time);
 
 
-    fprintf( outfile, "------ Contadores estadisticos de cola Q1 ------\n");
+    /*fprintf( outfile, "------ Contadores estadisticos de cola Q1 ------\n");
     fprintf( outfile,"Demora promedio de clientes en cola : %10.4f minutos\n",total_of_delays_1 / num_custs_delayed_1);
     fprintf( outfile,"Numero promedio de clientes en cola : %10.4f\n\n",area_num_in_q_1 / sim_time);
 
@@ -536,13 +582,11 @@ void report(void)  /* Report generator function. */
     fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo 1 : %.4f\n", area_server_status_B_type1 / area_server_status_B);
     fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo 2 : %.4f\n\n", area_server_status_B_type2 / area_server_status_B);
 
-    fprintf(outfile, "Termino del reloj de la simulacion%12.3f minutos\n\n", sim_time);
+    fprintf(outfile, "Termino del reloj de la simulacion%12.3f minutos\n\n", sim_time);*/
 
 }
 
-
-void update_time_avg_stats(void)  /* Update area accumulators for time-average
-                                     statistics. */
+void update_time_avg_stats(void)  /* Update area accumulators for time-average statistics. */
 {
     float time_since_last_event;
 
@@ -580,7 +624,7 @@ void update_time_avg_stats(void)  /* Update area accumulators for time-average
 
 float expon(float mean)  /* Exponential variate generation function. */
 {
-    return -mean * log(lcgrand(1));
+    return -mean * log(lcgrand(SEED));
 }
 
 float randomReal(void){
@@ -633,11 +677,9 @@ void attend_queue_2 (int event_type){
         time_arrival_2[i] = time_arrival_2[i + 1];
    }
 
-
 bool is_there_any_server_idle(void){
     return server_status_A1 == IDLE || server_status_A2 == IDLE || server_status_B == IDLE;
 }
-
 
 bool is_there_any_serverA_idle(void){
     return server_status_A1 == IDLE || server_status_A2 == IDLE;

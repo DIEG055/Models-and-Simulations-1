@@ -1,26 +1,26 @@
------- Contadores estadisticos de cola Q1 ------
-Demora promedio de clientes en cola :     0.0272 minutos
-Numero promedio de clientes en cola :     0.0190
+AVERAGE_DELAY_Q1:       0.043 minutes
 
------- Contadores estadisticos de cola Q2 ------
-Demora promedio de clientes en cola :     0.2169 minutos
-Numero promedio de clientes en cola :     0.0573
+AVERAGE_NUMBER_Q1:       0.030 minutes
 
+AVERAGE_DELAY_Q2:       0.235 minutes
 
------- Contadores estadisticos de servidor A1 ------
-Utiliacion del servidor                     : 0.43183
-Proporcion tiempo dedicada a cliente tipo1  : 0.7576
-Proporcion tiempo dedicada a cliente tipo2  : 0.2424
+AVERAGE_NUMBER_Q2:       0.071 minutes
 
------- Contadores estadisticos de servidor A2 ------
-Utiliacion del servidor                     : 0.23099
-Proporcion tiempo dedicada a cliente tipo 1 : 0.8271
-Proporcion tiempo dedicada a cliente tipo 2 : 0.1729
+PROPORTION_SERVER_A1_CLIENT_1:       0.215 minutes
 
------- Contadores estadisticos de servidor B  ------
-Utiliacion del servidor                     : 0.19841
-Proporcion tiempo dedicada a cliente tipo 1 : 0.2379
-Proporcion tiempo dedicada a cliente tipo 2 : 0.7621
+PROPORTION_SERVER_A1_CLIENT_2:       0.080 minutes
 
-Termino del reloj de la simulacion     999.830 minutos
+PROPORTION_SERVER_A2_CLIENT_1:       0.239 minutes
+
+PROPORTION_SERVER_A2_CLIENT_2:       0.053 minutes
+
+PROPORTION_SERVER_B_CLIENT_1:       0.043 minutes
+
+PROPORTION_SERVER_B_CLIENT_2:       0.043 minutes
+
+SERVER_UTILIZATION_A1:       0.043 minutes
+
+SERVER_UTILIZATION_A2:       0.043 minutes
+
+SERVER_UTILIZATION_B:       1.254 minutes
 
