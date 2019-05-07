@@ -5,10 +5,10 @@
 
 #define BUSY      1
 #define IDLE      0
-#define TOTAL_PRINTERS  3
-#define TOTAL_EMPLOYEES 1
+#define TOTAL_PRINTERS  13
+#define TOTAL_EMPLOYEES 12
 #define Q_LIMIT 100000
-int TOTAL_SEED=15;
+int TOTAL_SEED=100;
 int SEED;
 /*Acumulators for multiple iteratations with different seeds*/
 float AVERAGE_DELAY_Q1,AVERAGE_NUMBER_Q1,AVERAGE_DELAY_Q2,AVERAGE_NUMBER_Q2;
@@ -23,6 +23,8 @@ float mean_interarrival_t1, mean_interarrival_t2, mean_interarrival_t3;
 
 /* Printers */
 float mean_service_printer_t1,mean_service_printer_t2, mean_service_printer_t3;
+
+
 struct printer {
    int paper_inside;
    int status;
@@ -90,12 +92,27 @@ main()  /* Main function. */
     mean_interarrival_t2 = 60/mean_interarrival_t2;    // 8 papers / hour
     mean_interarrival_t3 =  60/mean_interarrival_t3;   // 16 papers / hour
 
+    fprintf(outfile, "System Inputs Exercise 1.5\n\n");
+    fprintf(outfile, "Mean interarrival time Document 1:%11.3f minutes\n",
+            mean_interarrival_t1);
+    fprintf(outfile, "Mean interarrival time Document 2:%11.3f minutes\n",
+            mean_interarrival_t2);
+    fprintf(outfile, "Mean interarrival time Document 3:%11.3f minutes\n",
+            mean_interarrival_t3);
+    fprintf(outfile, "Mean service printer for Document  1:%11.3f minutes\n", mean_service_printer_t1);
+    fprintf(outfile, "Mean service printer for Document  2:%11.3f minutes\n", mean_service_printer_t2);
+    fprintf(outfile, "Mean service printer for Document  3:%11.3f minutes\n", mean_service_printer_t3);
+    fprintf(outfile, "Mean service employee for Document 1:%11.3f minutes\n", mean_service_employee_t1);
+    fprintf(outfile, "Mean service employee for Document 2:%11.3f minutes\n", mean_service_employee_t2);
+    fprintf(outfile, "Mean service employee for Document 3:%11.3f minutes\n", mean_service_employee_t3);
+    fprintf(outfile, "-----------------------------------------------\n\n");
 
    /* Initialize the simulation. */
 
 
     /* Run the simulation while more delays are still needed. */
     for(SEED=1;SEED<=TOTAL_SEED;SEED++){
+        /* Initialize the simulation. */
         initialize();
         while(sim_time < end_time )
     {
@@ -431,11 +448,16 @@ void depart_employee (int number)  /* Departure event function. */
 }
 
 void general_report(void){
-    fprintf(outfile,"AVERAGE_DELAY_Q1(wait for print): %11.3f minutes\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
-    fprintf(outfile,"AVERAGE_NUMBER_Q1: %11.3f minutes\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
-    fprintf(outfile,"AVERAGE_DELAY_Q2(wait for inspection): %11.3f minutes\n",AVERAGE_DELAY_Q2/TOTAL_SEED);
-    fprintf(outfile,"AVERAGE_NUMBER_Q2: %11.3f minutes\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
-
+    fprintf(outfile,"If the reviewer want to check a waiting time = 0 in the system\n");
+    fprintf(outfile,"At the beginning of the file change:\n\n");
+    fprintf(outfile,"#define TOTAL_PRINTERS  13\n");
+    fprintf(outfile,"#define TOTAL_EMPLOYEES 12\n\n\n");
+    fprintf(outfile,"Original Case, 3 printers 1 employee,\n\n");
+    fprintf(outfile,"Average_Delay_PrinterQueue(wait for print): %11.3f minutes\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
+    fprintf(outfile,"Average_Number_PrinterQueue: %11.3f minutes\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
+    fprintf(outfile,"Average_Delay_EmployeeQueue(wait for inspection): %11.3f minutes\n",AVERAGE_DELAY_Q2/TOTAL_SEED);
+    fprintf(outfile,"Average_Number_EmployeeQueue: %11.3f minutes\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
+    fprintf(outfile,"----------------------------------------------\n\n");
     for (int i = 1 ;  i <= TOTAL_PRINTERS ;  i++){
            fprintf(outfile, "Printer #%d utilization : %15.3f\n", i , PRINTER_UTILIZATION[i]/TOTAL_SEED);
         }
@@ -443,7 +465,7 @@ void general_report(void){
            fprintf(outfile, "Employee #%d utilization : %15.3f\n", i , EMPLOYEE_UTILIZATION[i]/TOTAL_SEED);
         }
 }
-void report(void)  /* Report generator function. */
+void report(void)
 {
     /* Compute and write estimates of desired measures of performance. */
     AVERAGE_DELAY_Q1+=(total_of_delays_1 / num_custs_delayed_1);
@@ -453,32 +475,22 @@ void report(void)  /* Report generator function. */
 
     for (int i = 1 ;  i <= TOTAL_PRINTERS ;  i++){
         PRINTER_UTILIZATION[i]+= (printers[i].area_server_status / sim_time );
-
     }
-
-    /*fprintf(outfile, "\n\nEmployees\n\n");*/
     for (int i = 1 ;  i <= TOTAL_EMPLOYEES ;  i++){
         EMPLOYEE_UTILIZATION[i]+=(employees[i].area_server_status / sim_time );
-
     }
-
-
-
 }
 
 
-void update_time_avg_stats(void)  /* Update area accumulators for time-average
-                                     statistics. */
+void update_time_avg_stats(void)
 {
     float time_since_last_event;
 
     /* Compute time since last event, and update last-event-time marker. */
-
     time_since_last_event = sim_time - time_last_event;
     time_last_event       = sim_time;
 
     /* Update area under number-in-queue function. */
-
     area_num_in_q_1      += num_in_q_1 * time_since_last_event;
     area_num_in_q_2      += num_in_q_2 * time_since_last_event;
 
@@ -493,7 +505,7 @@ void update_time_avg_stats(void)  /* Update area accumulators for time-average
 
 }
 
-float expon(float mean)  /* Exponential variate generation function. */
+float expon(float mean)
 {
     /* Return an exponential random variate with mean "mean". */
     return -mean * log(lcgrand(SEED));

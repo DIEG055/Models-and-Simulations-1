@@ -6,14 +6,12 @@
 #define BUSY      1 /*Server BUSY*/
 #define IDLE      0 /*sERVER iDLE*/
 /*Different mean*/
-int TOTAL_SEED =100;
+int TOTAL_SEED =  1;
 
-/*Variables used for save data, when the simulation use Many Seeds. */
+/*Acumulators for multiple iteratations with different seeds*/
 int CUSTOMERS_IN_SYSTEM,CUSTOMERS_ATTENDED_SERVER_1,SEED;
 float AVERAGE_DELAY_Q1,AVERAGE_NUMBER_Q1, SERVER_UTILIZATION_1;
 float AVERAGE_DELAY_Q2,AVERAGE_NUMBER_Q2, SERVER_UTILIZATION_2;
-
-
 
 /*General*/
 int   next_event_type, num_events,stop_simulation, end_time;
@@ -67,7 +65,7 @@ main()  /* Main function. */
     fprintf(outfile, "Mean service 1 time:1%16.3f hours\n\n", mean_service_1);
     fprintf(outfile, "Mean service 2 time:1%16.3f hours\n\n", mean_service_2);
     fprintf(outfile, "-----------------------------------------------\n\n", mean_service_2);
-    /* Initialize the simulation. */
+
 
     CUSTOMERS_IN_SYSTEM=0;
     CUSTOMERS_ATTENDED_SERVER_1=0;
@@ -80,7 +78,7 @@ main()  /* Main function. */
 
     /* Run the simulation while simulation time is less than. */
     for(SEED=1;SEED<=TOTAL_SEED;SEED++){
-
+        /* Initialize the simulation. */
         initialize();
         while(sim_time < end_time )
         {
@@ -303,14 +301,15 @@ void depart_installation_2()   /* Server 2 Departure Event Function. */
 }
 
 void general_report(void){
-    printf("CUSTOMERS_IN_SYSTEM: %d\n",CUSTOMERS_IN_SYSTEM/TOTAL_SEED);
-    printf("CUSTOMERS_ATTENDED_SERVER_1: %d\n",CUSTOMERS_ATTENDED_SERVER_1/TOTAL_SEED);
-    printf("AVERAGE_DELAY_Q1:%11.3f\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
-    printf("AVERAGE_NUMBER_Q1: %11.3f\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
-    printf("SERVER_UTILIZATION_1: %11.3f\n",SERVER_UTILIZATION_1/TOTAL_SEED);
-    printf("AVERAGE_DELAY_Q2: %11.3f\n",AVERAGE_DELAY_Q2/TOTAL_SEED);
-    printf("AVERAGE_NUMBER_Q2: %11.3f\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
-    printf("SERVER_UTILIZATION_2: %11.3f\n",SERVER_UTILIZATION_2/TOTAL_SEED);
+    fprintf(outfile,"Number of Seeds used: %d\n",TOTAL_SEED);
+    fprintf(outfile,"Total Customers in system: %d\n",CUSTOMERS_IN_SYSTEM/TOTAL_SEED);
+    fprintf(outfile,"Total Customers Attended in server 1: %d\n",CUSTOMERS_ATTENDED_SERVER_1/TOTAL_SEED);
+    fprintf(outfile,"Average delay in queue 1 %11.3f hours\n\n",AVERAGE_DELAY_Q1/TOTAL_SEED);
+    fprintf(outfile,"Average number in queue 1: %11.3f\n",AVERAGE_NUMBER_Q1/TOTAL_SEED);
+    fprintf(outfile,"Server 1 utilization: %11.3f\n",SERVER_UTILIZATION_1/TOTAL_SEED);
+    fprintf(outfile,"Average delay in queue 2: %11.3f\n hours",AVERAGE_DELAY_Q2/TOTAL_SEED);
+    fprintf(outfile,"Average number in queue 2: %11.3f\n",AVERAGE_NUMBER_Q2/TOTAL_SEED);
+    fprintf(outfile,"Server 2 utilization: %11.3f\n",SERVER_UTILIZATION_2/TOTAL_SEED);
 
 }
 
@@ -325,26 +324,6 @@ void report(void)  /* Report generator function. */
     AVERAGE_DELAY_Q2+=(total_of_delays_2 / num_custs_delayed_2);
     AVERAGE_NUMBER_Q2+=(area_num_in_q_2 / sim_time);
     SERVER_UTILIZATION_2+=(area_server_status_2 / sim_time);
-
-    /* Compute and write estimates of desired measures of performance. */
-    fprintf(outfile,"Total Customers in system: %d \n\n", num_custs_delayed_1+num_custs_delayed_2);
-    fprintf(outfile,"Total Customers Attended in server 1: %d\n\n\n", num_custs_delayed_1);
-
-    fprintf(outfile, "Average delay in queue 1 %11.3f hours\n\n",
-            total_of_delays_1 / num_custs_delayed_1);
-    fprintf(outfile,"Average number in queue 1 %10.3f\n\n",
-            area_num_in_q_1 / sim_time);
-    fprintf(outfile,"Server 1 utilization%15.3f\n\n",
-            area_server_status_1 / sim_time);
-
-    fprintf(outfile, "\n\nAverage delay in queue 2 %11.3f hours\n\n",
-            total_of_delays_2 / num_custs_delayed_2);
-    fprintf(outfile,"Average number in queue 2 %10.3f\n\n",
-            area_num_in_q_2 / sim_time);
-    fprintf(outfile,"Server 2 utilization%15.3f\n\n\n",
-            area_server_status_2 / sim_time);
-
-    fprintf(outfile,"Time simulation ended%12.3f hours(336 hours = 2 Weeks)\n\n", sim_time);
 
 }
 
@@ -366,7 +345,7 @@ void update_time_avg_stats(void)
 }
 
 float poisson(float mean) {
-  return (1/mean)*exp(-(lcgrand(SEED)/mean));
+  return (mean)*exp(-(lcgrand(SEED)/(mean)));
 }
 
 float expon(float mean)  /* Exponential variate generation function. */

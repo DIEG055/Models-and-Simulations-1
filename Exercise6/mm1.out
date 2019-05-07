@@ -1,26 +1,34 @@
-AVERAGE_DELAY_Q1:       0.043 minutes
+System Inputs Exercise 1.6
 
-AVERAGE_NUMBER_Q1:       0.030 minutes
+Mean interarrival time:      1.000 hours
+Mean service 1 time:           0.800 hours
+Mean service 2  lower case time:           0.500 hours
+Mean service 2  upper case time:           0.700 hours
+Probability client type 1           0.700
+Probability client type 2           0.300
+-----------------------------------------------
 
-AVERAGE_DELAY_Q2:       0.235 minutes
+Average delay Q1:       0.027 minutes
 
-AVERAGE_NUMBER_Q2:       0.071 minutes
+Average number Q1:       0.019 minutes
 
-PROPORTION_SERVER_A1_CLIENT_1:       0.215 minutes
+Average delay Q2       0.217 minutes
 
-PROPORTION_SERVER_A1_CLIENT_2:       0.080 minutes
+Average number Q1:       0.057 minutes
 
-PROPORTION_SERVER_A2_CLIENT_1:       0.239 minutes
+Server A1
+Proportion Client 1:       0.758 
+Proportion Client 2:       0.242 
 
-PROPORTION_SERVER_A2_CLIENT_2:       0.053 minutes
+Server A2
+Proportion Client 1:       0.827 
+Proportion Client 2:       0.173 
 
-PROPORTION_SERVER_B_CLIENT_1:       0.043 minutes
+Server B
+Proportion Client 1:       0.238 
+Proportion Client 2:       0.762 
 
-PROPORTION_SERVER_B_CLIENT_2:       0.043 minutes
-
-SERVER_UTILIZATION_A1:       0.043 minutes
-
-SERVER_UTILIZATION_A2:       0.043 minutes
-
-SERVER_UTILIZATION_B:       1.254 minutes
+Server A1 used for:       0.432
+Server A2 used for:       0.231
+Server B used for:       0.198
 

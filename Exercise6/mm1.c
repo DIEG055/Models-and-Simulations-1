@@ -10,7 +10,7 @@
 
 /*Variables used for save data, when the simulation use Many Seeds. */
 int SEED;
-int TOTAL_SEEDS = 10;
+int TOTAL_SEEDS = 1;
 float  AVERAGE_DELAY_Q1,AVERAGE_NUMBER_Q1,AVERAGE_DELAY_Q2,AVERAGE_NUMBER_Q2,
     PROPORTION_SERVER_A1_CLIENT_1,PROPORTION_SERVER_A1_CLIENT_2,PROPORTION_SERVER_A2_CLIENT_1,
     PROPORTION_SERVER_A2_CLIENT_2,PROPORTION_SERVER_B_CLIENT_1,PROPORTION_SERVER_B_CLIENT_2,
@@ -107,10 +107,20 @@ main()  /* Main function. */
     SERVER_UTILIZATION_A2=0;
     SERVER_UTILIZATION_B=0;
     SEED=1;
+
     /* Read input parameters. */
     fscanf(infile, "%f %f %f %f %f %f", &mean_interarrival, &probability_type1_client,
            &probability_type2_client, &mean_service_1, &mean_service_2_lower, &mean_service_2_upper);
 
+    fprintf(outfile, "System Inputs Exercise 1.6\n\n");
+    fprintf(outfile, "Mean interarrival time:%11.3f hours\n",
+            mean_interarrival);
+    fprintf(outfile, "Mean service 1 time:%16.3f hours\n", mean_service_1);
+    fprintf(outfile, "Mean service 2  lower case time:%16.3f hours\n", mean_service_2_lower);
+    fprintf(outfile, "Mean service 2  upper case time:%16.3f hours\n", mean_service_2_upper);
+    fprintf(outfile, "Probability client type 1%16.3f\n", probability_type1_client);
+    fprintf(outfile, "Probability client type 2%16.3f\n", probability_type2_client);
+    fprintf(outfile, "-----------------------------------------------\n\n");
     /* Initialize the simulation. */
     for(SEED=1;SEED<=TOTAL_SEEDS;SEED++){
         initialize();
@@ -500,20 +510,24 @@ void depart_B_A2 (void){
         time_next_event[3] = 1.0e+30;
     }
 }
+
 void general_report(void){
-    fprintf(outfile,"AVERAGE_DELAY_Q1: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
-    fprintf(outfile,"AVERAGE_NUMBER_Q1: %11.3f minutes\n\n",AVERAGE_NUMBER_Q1/TOTAL_SEEDS);
-    fprintf(outfile,"AVERAGE_DELAY_Q2: %11.3f minutes\n\n",AVERAGE_DELAY_Q2/TOTAL_SEEDS);
-    fprintf(outfile,"AVERAGE_NUMBER_Q2: %11.3f minutes\n\n",AVERAGE_NUMBER_Q2/TOTAL_SEEDS);
-    fprintf(outfile,"PROPORTION_SERVER_A1_CLIENT_1: %11.3f minutes\n\n",PROPORTION_SERVER_A1_CLIENT_1/TOTAL_SEEDS);
-    fprintf(outfile,"PROPORTION_SERVER_A1_CLIENT_2: %11.3f minutes\n\n",PROPORTION_SERVER_A1_CLIENT_2/TOTAL_SEEDS);
-    fprintf(outfile,"PROPORTION_SERVER_A2_CLIENT_1: %11.3f minutes\n\n",PROPORTION_SERVER_A2_CLIENT_1/TOTAL_SEEDS);
-    fprintf(outfile,"PROPORTION_SERVER_A2_CLIENT_2: %11.3f minutes\n\n",PROPORTION_SERVER_A2_CLIENT_2/TOTAL_SEEDS);
-    fprintf(outfile,"PROPORTION_SERVER_B_CLIENT_1: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
-    fprintf(outfile,"PROPORTION_SERVER_B_CLIENT_2: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
-    fprintf(outfile,"SERVER_UTILIZATION_A1: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
-    fprintf(outfile,"SERVER_UTILIZATION_A2: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
-    fprintf(outfile,"SERVER_UTILIZATION_B: %11.3f minutes\n\n",SERVER_UTILIZATION_B/TOTAL_SEEDS);
+    fprintf(outfile,"Average delay Q1: %11.3f minutes\n\n",AVERAGE_DELAY_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"Average number Q1: %11.3f minutes\n\n",AVERAGE_NUMBER_Q1/TOTAL_SEEDS);
+    fprintf(outfile,"Average delay Q2 %11.3f minutes\n\n",AVERAGE_DELAY_Q2/TOTAL_SEEDS);
+    fprintf(outfile,"Average number Q1: %11.3f minutes\n\n",AVERAGE_NUMBER_Q2/TOTAL_SEEDS);
+    fprintf(outfile,"Server A1\n");
+    fprintf(outfile,"Proportion Client 1: %11.3f \n",PROPORTION_SERVER_A1_CLIENT_1/TOTAL_SEEDS);
+    fprintf(outfile,"Proportion Client 2: %11.3f \n\n",PROPORTION_SERVER_A1_CLIENT_2/TOTAL_SEEDS);
+    fprintf(outfile,"Server A2\n");
+    fprintf(outfile,"Proportion Client 1: %11.3f \n",PROPORTION_SERVER_A2_CLIENT_1/TOTAL_SEEDS);
+    fprintf(outfile,"Proportion Client 2: %11.3f \n\n",PROPORTION_SERVER_A2_CLIENT_2/TOTAL_SEEDS);
+    fprintf(outfile,"Server B\n");
+    fprintf(outfile,"Proportion Client 1: %11.3f \n",PROPORTION_SERVER_B_CLIENT_1/TOTAL_SEEDS);
+    fprintf(outfile,"Proportion Client 2: %11.3f \n\n",PROPORTION_SERVER_B_CLIENT_2/TOTAL_SEEDS);
+    fprintf(outfile,"Server A1 used for: %11.3f\n",SERVER_UTILIZATION_A1/TOTAL_SEEDS);
+    fprintf(outfile,"Server A2 used for: %11.3f\n",SERVER_UTILIZATION_A2/TOTAL_SEEDS);
+    fprintf(outfile,"Server B used for: %11.3f\n\n",SERVER_UTILIZATION_B/TOTAL_SEEDS);
 }
 void report(void)  /* Report generator function. */
 {
@@ -530,59 +544,6 @@ void report(void)  /* Report generator function. */
         SERVER_UTILIZATION_A1+=(area_server_status_A1 / sim_time);
         SERVER_UTILIZATION_A2+=(area_server_status_A2 / sim_time);
         SERVER_UTILIZATION_B+=(area_server_status_B / sim_time);
-
-
-    /* Compute and write estimates of desired measures of performance. */
-    printf( "------ Contadores estadisticos de cola Q1 ------\n");
-    printf( "Demora promedio de clientes en cola : %10.4f minutos\n",total_of_delays_1 / num_custs_delayed_1);
-    printf( "Numero promedio de clientes en cola : %10.4f\n\n",area_num_in_q_1 / sim_time);
-
-    printf( "------ Contadores estadisticos de cola Q2 ------\n");
-    printf( "Demora promedio de clientes en cola : %10.4f minutos\n", total_of_delays_2 / num_custs_delayed_2);
-    printf( "Numero promedio de clientes en cola : %10.4f\n\n\n", area_num_in_q_2 / sim_time);
-
-    printf( "------ Contadores estadisticos de servidor A1 ------\n");
-    printf("Utiliacion del servidor                     : %.5f\n", area_server_status_A1 / sim_time);
-    printf("Proporcion tiempo dedicada a cliente tipo1  : %.4f\n", area_server_status_A1_type1 / area_server_status_A1);
-    printf("Proporcion tiempo dedicada a cliente tipo2  : %.4f\n\n", area_server_status_A1_type2 / area_server_status_A1);
-
-    printf( "------ Contadores estadisticos de servidor A2 ------\n");
-    printf("Utiliacion del servidor                     : %.5f\n", area_server_status_A2 / sim_time);
-    printf("Proporcion tiempo dedicada a cliente tipo 1 : %.4f\n", area_server_status_A2_type1 / area_server_status_A2);
-    printf("Proporcion tiempo dedicada a cliente tipo 2 : %.4f\n\n", area_server_status_A2_type2 / area_server_status_A2);
-
-    printf( "------ Contadores estadisticos de servidor B  ------\n");
-    printf("Utiliacion del servidor                     : %.5f\n", area_server_status_B / sim_time);
-    printf("Proporcion tiempo dedicada a cliente tipo 1 : %.4f\n", area_server_status_B_type1 / area_server_status_B);
-    printf("Proporcion tiempo dedicada a cliente tipo 2 : %.4f\n\n", area_server_status_B_type2 / area_server_status_B);
-
-    printf( "Termino del reloj de la simulacion%12.3f minutos\n\n", sim_time);
-
-
-    /*fprintf( outfile, "------ Contadores estadisticos de cola Q1 ------\n");
-    fprintf( outfile,"Demora promedio de clientes en cola : %10.4f minutos\n",total_of_delays_1 / num_custs_delayed_1);
-    fprintf( outfile,"Numero promedio de clientes en cola : %10.4f\n\n",area_num_in_q_1 / sim_time);
-
-    fprintf( outfile,"------ Contadores estadisticos de cola Q2 ------\n");
-    fprintf(outfile,"Demora promedio de clientes en cola : %10.4f minutos\n", total_of_delays_2 / num_custs_delayed_2);
-    fprintf( outfile,"Numero promedio de clientes en cola : %10.4f\n\n\n", area_num_in_q_2 / sim_time);
-
-    fprintf( outfile,"------ Contadores estadisticos de servidor A1 ------\n");
-    fprintf(outfile,"Utiliacion del servidor                     : %.5f\n", area_server_status_A1 / sim_time);
-    fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo1  : %.4f\n", area_server_status_A1_type1 / area_server_status_A1);
-    fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo2  : %.4f\n\n", area_server_status_A1_type2 / area_server_status_A1);
-
-    fprintf( outfile,"------ Contadores estadisticos de servidor A2 ------\n");
-    fprintf(outfile,"Utiliacion del servidor                     : %.5f\n", area_server_status_A2 / sim_time);
-    fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo 1 : %.4f\n", area_server_status_A2_type1 / area_server_status_A2);
-    fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo 2 : %.4f\n\n", area_server_status_A2_type2 / area_server_status_A2);
-
-    fprintf(outfile, "------ Contadores estadisticos de servidor B  ------\n");
-    fprintf(outfile,"Utiliacion del servidor                     : %.5f\n", area_server_status_B / sim_time);
-    fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo 1 : %.4f\n", area_server_status_B_type1 / area_server_status_B);
-    fprintf(outfile,"Proporcion tiempo dedicada a cliente tipo 2 : %.4f\n\n", area_server_status_B_type2 / area_server_status_B);
-
-    fprintf(outfile, "Termino del reloj de la simulacion%12.3f minutos\n\n", sim_time);*/
 
 }
 
